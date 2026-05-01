@@ -15,22 +15,17 @@ version = 10.12
 # 需求
 requirements = python3==3.9.7,kivy==2.1.0,requests==2.28.1,websocket-client==1.4.2,Pillow==9.4.0
 
-# Android SDK 配置
-android.accept_sdk_license = True  # 添加这一行，自动接受许可证
+# Android SDK 配置 - 注意：注释不能和配置在同一行！
+android.accept_sdk_license = True
 android.ndk = 23b
 android.sdk = 30
 android.api = 30
 android.minapi = 21
-
-# Android 构建工具版本（指定一个存在的版本）
-android.sdk_build_tools = 30.0.3  # 使用 30.0.3 而不是 37
+android.sdk_build_tools = 30.0.3
+android.ndk_version = 23b
 
 # 权限
 android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, ACCESS_NETWORK_STATE, ACCESS_WIFI_STATE
-
-# 应用图标（可选）
-# icon.filename = %(source.dir)s/icon.png
-# presplash.filename = %(source.dir)s/splash.png
 
 # 架构
 android.archs = armeabi-v7a, arm64-v8a
@@ -52,13 +47,6 @@ buildozer.cache_limit = 2000
 # 屏幕方向
 orientation = portrait
 fullscreen = 0
-
-# 类别
-android.category = android.intent.category.LAUNCHER
-
-# 主题
-android.phone.background_style = transparent
-android.window_background_color = #1a1a2e
 
 # 编译
 buildozer.threads = 4
