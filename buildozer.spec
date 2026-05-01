@@ -10,7 +10,7 @@ version = 10.12
 # 要求的Python版本
 osx.python_version = 3.8
 android.ndk = 25b
-android.sdk = 24
+#android.sdk = 24
 android.api = 33
 android.ndk.api = 21
 android.build_tools = 33.0.2
