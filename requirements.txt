@@ -3,3 +3,4 @@ kivy==2.1.0
 requests
 websocket-client
 Pillow
+Cython==3.0.11
