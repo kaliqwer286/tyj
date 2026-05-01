@@ -1,4 +1,4 @@
-name: Build APK
+name: Build APK with Docker
 
 on:
   push:
@@ -7,64 +7,31 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     
-    - name: 安装系统依赖
+    - name: 使用 Docker 构建
       run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          git zip unzip openjdk-11-jdk \
-          autoconf libtool pkg-config \
-          zlib1g-dev libncurses5-dev \
-          libncursesw5-dev libtinfo5 cmake \
-          libffi-dev libssl-dev
-    
-    - name: 安装 Buildozer
-      run: |
-        pip install --upgrade pip
-        pip install buildozer cython
-    
-    - name: 初始化 Buildozer
-      run: |
-        # 创建 Android 目录
-        mkdir -p ~/.buildozer/android/platform
-        
-        # 设置环境变量
-        echo "ANDROIDSDK=~/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-        echo "ANDROIDNDK=~/.buildozer/android/platform/android-ndk-r23b" >> $GITHUB_ENV
-        echo "ANDROIDAPI=30" >> $GITHUB_ENV
-        echo "ANDROIDMINAPI=21" >> $GITHUB_ENV
-    
-    - name: 构建 APK
-      run: |
-        # 清理之前的构建
-        buildozer clean
-        
-        # 构建（使用 expect 自动接受许可证）
-        expect -c '
-        set timeout -1
-        spawn buildozer -v android debug
-        expect {
-          "Accept? (y/N):" { send "y\r"; exp_continue }
-          eof
-        }'
-    
-    - name: 查找并上传 APK
-      if: success()
-      run: |
-        echo "查找 APK 文件..."
-        find . -name "*.apk" -type f
-        mkdir -p output
-        find . -name "*.apk" -type f -exec cp {} output/ \;
-        ls -la output/
+        docker run --rm \
+          -v ${{ github.workspace }}:/project \
+          -v ${{ github.workspace }}/bin:/project/bin \
+          -w /project \
+          kivy/buildozer:latest \
+          bash -c "
+            # 修复配置文件中的注释问题
+            sed -i 's/True #.*/True/' buildozer.spec 2>/dev/null || true
+            sed -i 's/False #.*/False/' buildozer.spec 2>/dev/null || true
+            
+            # 构建
+            yes | buildozer android debug
+          "
     
     - name: 上传 APK
       uses: actions/upload-artifact@v4
       with:
         name: atsc-wallet-apk
-        path: output/*.apk
+        path: bin/*.apk
         retention-days: 30
