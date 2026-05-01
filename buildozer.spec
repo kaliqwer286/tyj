@@ -9,66 +9,62 @@ package.domain = org.atsc
 source.dir = .
 source.include_exts = py,png,jpg,kv,atsc,txt,json
 
-# 版本（选择一种方式）
-# 方式1：固定版本
+# 版本
 version = 10.12
 
-
+# 需求
 requirements = python3==3.9.7,kivy==2.1.0,requests==2.28.1,websocket-client==1.4.2,Pillow==9.4.0
 
-# 允许的权限
-android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, ACCESS_NETWORK_STATE, ACCESS_WIFI_STATE
-
-# Android API级别
-android.api = 30
-android.minapi = 21
+# Android SDK 配置
+android.accept_sdk_license = True  # 添加这一行，自动接受许可证
 android.ndk = 23b
 android.sdk = 30
+android.api = 30
+android.minapi = 21
+
+# Android 构建工具版本（指定一个存在的版本）
+android.sdk_build_tools = 30.0.3  # 使用 30.0.3 而不是 37
+
+# 权限
+android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, ACCESS_NETWORK_STATE, ACCESS_WIFI_STATE
 
 # 应用图标（可选）
 # icon.filename = %(source.dir)s/icon.png
 # presplash.filename = %(source.dir)s/splash.png
 
-# 支持的架构
+# 架构
 android.archs = armeabi-v7a, arm64-v8a
 
-# 调试模式
+# 调试
 android.release = False
 android.debug = True
 
-# 日志级别
+# 日志
 log_level = 2
 
-# 忽略的目录
+# 忽略
 android.exclude_activity_context = True
 source.exclude_exts = pyc,pyo,so,git
 
-# 允许下载缓存
+# 缓存
 buildozer.cache_limit = 2000
 
 # 屏幕方向
 orientation = portrait
-
-# 全屏
 fullscreen = 0
 
-# 应用类别
+# 类别
 android.category = android.intent.category.LAUNCHER
 
-# 应用主题
+# 主题
 android.phone.background_style = transparent
 android.window_background_color = #1a1a2e
 
-# 编译线程数
+# 编译
 buildozer.threads = 4
-
-# 开发模式
 android.ignore_setup_os = True
 
 [buildozer]
 
-# 日志级别
 log_level = 2
-
-# 警告抑制
 warn_on_root = 0
