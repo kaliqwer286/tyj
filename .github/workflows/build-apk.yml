@@ -7,61 +7,64 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    container:
-      image: kivy/buildozer:latest
+    runs-on: ubuntu-20.04
     
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     
-    - name: 修复环境并安装依赖
+    - name: 安装系统依赖
       run: |
-        # 更新包管理器
-        apt-get update
-        # 安装必要的依赖
-        apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool
-        
-        # 升级pip和buildozer
-        pip install --upgrade pip
-        pip install --upgrade buildozer cython
-        
-        # 设置Java环境
-        export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+        sudo apt-get update
+        sudo apt-get install -y \
+          git zip unzip openjdk-11-jdk \
+          autoconf libtool pkg-config \
+          zlib1g-dev libncurses5-dev \
+          libncursesw5-dev libtinfo5 cmake \
+          libffi-dev libssl-dev
     
-    - name: 配置Android SDK
+    - name: 安装 Buildozer
       run: |
-        # 设置Android环境变量
-        echo "ANDROIDSDK=/home/user/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-        echo "ANDROIDNDK=/home/user/.buildozer/android/platform/android-ndk-r23b" >> $GITHUB_ENV
+        pip install --upgrade pip
+        pip install buildozer cython
+    
+    - name: 初始化 Buildozer
+      run: |
+        # 创建 Android 目录
+        mkdir -p ~/.buildozer/android/platform
+        
+        # 设置环境变量
+        echo "ANDROIDSDK=~/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+        echo "ANDROIDNDK=~/.buildozer/android/platform/android-ndk-r23b" >> $GITHUB_ENV
         echo "ANDROIDAPI=30" >> $GITHUB_ENV
         echo "ANDROIDMINAPI=21" >> $GITHUB_ENV
-        
-        # 创建目录
-        mkdir -p /home/user/.buildozer/android/platform/
     
-    - name: 构建APK
+    - name: 构建 APK
       run: |
-        # 强制接受所有Android SDK许可证
-        yes | buildozer android debug || true
+        # 清理之前的构建
+        buildozer clean
         
-        # 如果失败，尝试清理后重新构建
-        if [ ! -f bin/*.apk ]; then
-          buildozer clean
-          buildozer android debug
-        fi
+        # 构建（使用 expect 自动接受许可证）
+        expect -c '
+        set timeout -1
+        spawn buildozer -v android debug
+        expect {
+          "Accept? (y/N):" { send "y\r"; exp_continue }
+          eof
+        }'
     
-    - name: 列出生成的文件
-      run: |
-        echo "检查bin目录："
-        ls -la bin/ || echo "bin目录不存在"
-        echo "检查构建目录："
-        ls -la .buildozer/ || echo "构建目录不存在"
-    
-    - name: 上传APK
+    - name: 查找并上传 APK
       if: success()
+      run: |
+        echo "查找 APK 文件..."
+        find . -name "*.apk" -type f
+        mkdir -p output
+        find . -name "*.apk" -type f -exec cp {} output/ \;
+        ls -la output/
+    
+    - name: 上传 APK
       uses: actions/upload-artifact@v4
       with:
         name: atsc-wallet-apk
-        path: bin/*.apk
+        path: output/*.apk
         retention-days: 30
