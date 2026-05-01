@@ -9,10 +9,13 @@ package.domain = org.atsc
 source.dir = .
 source.include_exts = py,png,jpg,kv,atsc,txt,json
 
-# 版本
+# 版本（选择一种方式）
+# 方式1：固定版本
 version = 10.12
-version.regex = CURRENT_VERSION = "([0-9]+\.[0-9]+)"
-version.filename = main.py
+
+# 方式2：从文件读取（如果使用方式2，请注释掉上面的version）
+# version.regex = CURRENT_VERSION = "([0-9]+\.[0-9]+)"
+# version.filename = main.py
 
 # 需求
 requirements = python3==3.9.7,kivy==2.1.0,requests==2.28.1,websocket-client==1.4.2,Pillow==9.4.0
@@ -26,9 +29,9 @@ android.minapi = 21
 android.ndk = 23b
 android.sdk = 30
 
-# 应用图标（可选，放在项目根目录）
+# 应用图标（可选）
 # icon.filename = %(source.dir)s/icon.png
-#presplash.filename = %(source.dir)s/splash.png
+# presplash.filename = %(source.dir)s/splash.png
 
 # 支持的架构
 android.archs = armeabi-v7a, arm64-v8a
