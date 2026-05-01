@@ -33,6 +33,8 @@ requirements = python3,kivy==2.1.0,requests,websocket-client,Pillow
 android.accept_sdk_license = True
 android.ndk_path = /usr/local/android-sdk/ndk/25b
 android.sdk_path = /usr/local/android-sdk
+android.sdk_path = %(home)s/android-sdk
+android.ndk_path = %(home)s/android-sdk/ndk/25.2.9519653
 
 [buildozer]
 log_level = 2
