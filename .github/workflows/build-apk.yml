@@ -1,8 +1,6 @@
-name: Build APK with Docker
+name: Build APK
 
 on:
-  push:
-    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -10,28 +8,18 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
     
-    - name: 使用 Docker 构建
+    - name: Build APK with Docker
       run: |
         docker run --rm \
           -v ${{ github.workspace }}:/project \
-          -v ${{ github.workspace }}/bin:/project/bin \
           -w /project \
           kivy/buildozer:latest \
-          bash -c "
-            # 修复配置文件中的注释问题
-            sed -i 's/True #.*/True/' buildozer.spec 2>/dev/null || true
-            sed -i 's/False #.*/False/' buildozer.spec 2>/dev/null || true
-            
-            # 构建
-            yes | buildozer android debug
-          "
+          bash -c "yes | buildozer android debug"
     
-    - name: 上传 APK
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: atsc-wallet-apk
         path: bin/*.apk
-        retention-days: 30
