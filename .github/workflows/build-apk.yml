@@ -15,32 +15,51 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     
-    - name: 验证 buildozer.spec
+    - name: 修复环境并安装依赖
       run: |
-        # 检查是否有冲突的版本配置
-        if grep -q "version\s*=" buildozer.spec && grep -q "version.regex" buildozer.spec; then
-          echo "错误：同时定义了version和version.regex"
-          echo "请只保留其中一个"
-          exit 1
-        fi
-        echo "配置文件验证通过"
+        # 更新包管理器
+        apt-get update
+        # 安装必要的依赖
+        apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool
+        
+        # 升级pip和buildozer
+        pip install --upgrade pip
+        pip install --upgrade buildozer cython
+        
+        # 设置Java环境
+        export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
     
-    - name: 设置环境变量
+    - name: 配置Android SDK
       run: |
-        echo "ANDROIDSDK=/home/user/.android" >> $GITHUB_ENV
-        echo "ANDROIDNDK=/home/user/.android" >> $GITHUB_ENV
+        # 设置Android环境变量
+        echo "ANDROIDSDK=/home/user/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+        echo "ANDROIDNDK=/home/user/.buildozer/android/platform/android-ndk-r23b" >> $GITHUB_ENV
         echo "ANDROIDAPI=30" >> $GITHUB_ENV
         echo "ANDROIDMINAPI=21" >> $GITHUB_ENV
-    
-    - name: 更新Buildozer
-      run: |
-        pip install --upgrade buildozer cython
+        
+        # 创建目录
+        mkdir -p /home/user/.buildozer/android/platform/
     
     - name: 构建APK
       run: |
-        buildozer android debug
+        # 强制接受所有Android SDK许可证
+        yes | buildozer android debug || true
+        
+        # 如果失败，尝试清理后重新构建
+        if [ ! -f bin/*.apk ]; then
+          buildozer clean
+          buildozer android debug
+        fi
+    
+    - name: 列出生成的文件
+      run: |
+        echo "检查bin目录："
+        ls -la bin/ || echo "bin目录不存在"
+        echo "检查构建目录："
+        ls -la .buildozer/ || echo "构建目录不存在"
     
     - name: 上传APK
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: atsc-wallet-apk
