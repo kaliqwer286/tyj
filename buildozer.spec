@@ -13,11 +13,7 @@ source.include_exts = py,png,jpg,kv,atsc,txt,json
 # 方式1：固定版本
 version = 10.12
 
-# 方式2：从文件读取（如果使用方式2，请注释掉上面的version）
-# version.regex = CURRENT_VERSION = "([0-9]+\.[0-9]+)"
-# version.filename = main.py
 
-# 需求
 requirements = python3==3.9.7,kivy==2.1.0,requests==2.28.1,websocket-client==1.4.2,Pillow==9.4.0
 
 # 允许的权限
