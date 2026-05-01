@@ -17,7 +17,7 @@ android.build_tools = 33.0.2
 
 # 应用权限
 android.permissions = INTERNET,ACCESS_NETWORK_STATE,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE
-android.arch = arm64-v8a,x86_64  # 支持的CPU架构
+android.archs = arm64-v8a,x86_64  # 支持的CPU架构
 
 # Kivy配置
 kivy.version = 2.1.0
